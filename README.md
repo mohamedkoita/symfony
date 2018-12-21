@@ -38,4 +38,9 @@ Publiez les assets dans le répertoire web :
 
     php bin/console assets:install web
 
+## 6. Soyez heureux
+N'oubliez pas de laisser un pourboire à l'inintiateur de ce projet
+    
+    M. KOITA MOHAMED au 49-91-85-55
+
 ## Et profitez !
