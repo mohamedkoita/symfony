@@ -81,9 +81,11 @@ class AdvertController extends Controller
   {
    //On créé une annonce
     $advert = new Advert;
-    $advert->setTitle('Recherche d\'un développeur Senior Java ');
+    $advert->setTitle('Recherche d\'un développeur Senior C# ');
     $advert->setContent('Une grande structure de la place recherche un développeur expérimenté JAVA afin de l\'intégrer à un projet Urgent !!');
-    $advert->setAuthor('Smile Côte d\'Ivoire');
+    $advert->setAuthor('Mohamed KOITA');
+    $advert->setAuthorEmail('mohamedkoita17@gmail.com');
+    $advert->setUpdatedAt(new \Datetime());
 
     //On créé des applications à cette annonce
     $application1 = new Application;
@@ -201,12 +203,36 @@ class AdvertController extends Controller
     }
 
     // La méthode findAll retourne toutes les catégories de la base de données
-    $listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+    /*$listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+
 
     // On boucle sur les catégories pour les lier à l'annonce
     foreach ($listCategories as $category) {
       $advert->addCategory($category);
-    }
+    }*/
+    //On créé des applications à cette annonce
+    $application1 = new Application;
+    $application1->setAuthor('Koffi Steve');
+    $application1->setContent('Je suis un développeur Java confirmé avec de plus de 15 années d\'expérience dans le domaine');
+    
+
+    $application2 = new Application;
+    $application2->setAuthor('Aka Lambelin');
+    $application2->setContent('Je suis certifié en développement Java niveau 8 ');
+    
+
+    //On lie les candidatures aux annonces
+    //$application1->setAdvert($advert);
+    //$application2->setAdvert($advert);
+    $advert->AddApplication($application1);
+    $advert->AddApplication($application2);
+
+    //On persiste les deux candidatures posées car il n'y a pas de persistance en cascade ici
+    $em->persist($application1);
+    $em->persist($application2);
+
+    
+    //$advert->setAuthor('Mohamed KOITA');
 
     // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
     // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
@@ -251,11 +277,13 @@ class AdvertController extends Controller
   public function menuAction($limit)
   {
     // On fixe en dur une liste ici, bien entendu par la suite on la récupérera depuis la BDD !
-    $listAdverts = array(
+    /*$listAdverts = array(
       array('id' => 2, 'title' => 'Recherche développeur Symfony'),
       array('id' => 5, 'title' => 'Mission de webmaster'),
       array('id' => 9, 'title' => 'Offre de stage webdesigner')
-    );
+    );*/
+
+    $listAdverts = $this->getDoctrine()->getManager()->getRepository('OCPlatformBundle:Advert')->myFindAll();
 
     return $this->render('OCPlatformBundle:Advert:menu.html.twig', array(
       // Tout l'intérêt est ici : le contrôleur passe les variables nécessaires au template !

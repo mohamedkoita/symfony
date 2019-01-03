@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table(name="oc_advert")
  * @ORM\Entity(repositoryClass="OC\PlatformBundle\Repository\AdvertRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\HasLifecycleCallbacks
  */
 class Advert
 {
@@ -91,6 +93,13 @@ class Advert
   /**
    * @var string
    *
+   * @ORM\Column(name="author_email", type="string", length=255)
+   */
+  private $authorEmail;
+
+  /**
+   * @var string
+   *
    * @ORM\Column(name="content", type="string", length=255)
    */
   private $content;
@@ -102,6 +111,32 @@ class Advert
    */
   private $published = true;
 
+  /**
+   * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+   */
+  private $updatedAt;
+
+  /**
+   * @ORM\Column(name="nb_applications", type="integer")
+   */
+  private $nbApplications = 0;
+
+  public function increaseApllications() {
+    $this->nbApplications++;
+  }
+
+  public function decreaseApplications() {
+    $this->nbApplications--;
+  }
+
+  /**
+   *@ORM\PreUpdate
+   */
+  public function updateDate() {
+    $this->setUpdatedAt(new \Datetime());
+  }
+
+  
 
   /**
    * @return int
@@ -242,5 +277,77 @@ class Advert
     public function getApplications()
     {
       return $this->applications;
+    }
+
+    /**
+     * Set updatedAt.
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return Advert
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt.
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set authorEmail.
+     *
+     * @param string $authorEmail
+     *
+     * @return Advert
+     */
+    public function setAuthorEmail($authorEmail)
+    {
+        $this->authorEmail = $authorEmail;
+
+        return $this;
+    }
+
+    /**
+     * Get authorEmail.
+     *
+     * @return string
+     */
+    public function getAuthorEmail()
+    {
+        return $this->authorEmail;
+    }
+
+    /**
+     * Set nbApplications.
+     *
+     * @param int $nbApplications
+     *
+     * @return Advert
+     */
+    public function setNbApplications($nbApplications)
+    {
+        $this->nbApplications = $nbApplications;
+
+        return $this;
+    }
+
+    /**
+     * Get nbApplications.
+     *
+     * @return int
+     */
+    public function getNbApplications()
+    {
+        return $this->nbApplications;
     }
 }
