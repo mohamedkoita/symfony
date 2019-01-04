@@ -10,6 +10,8 @@
 
   <h2>{{ advert.title }}</h2>
   <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i>
+  <p>Le slug généré {{ advert.slug }}</p>
+
 
   <div class="well">
     {{ advert.content }}

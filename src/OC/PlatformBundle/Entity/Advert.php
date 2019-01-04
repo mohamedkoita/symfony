@@ -4,6 +4,7 @@ namespace OC\PlatformBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 
 /**
@@ -33,6 +34,8 @@ class Advert
     $this->date = new \Datetime();
     $this->categories = new ArrayCollection();
     $this->applications = new ArrayCollection();
+    $this->updatedAt = new \Datetime();
+    
   }
 
   //On définit le setter. Ici on ajoute une catégorie à la fois 
@@ -54,6 +57,11 @@ class Advert
     return $this->categories;
   }
 
+  /**
+   * @Gedmo\Slug(fields={"title"})
+   * @ORM\Column(name="slug", type="string", length=255, unique=true)
+   */
+  private $slug;
 
   /**
    * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
@@ -349,5 +357,29 @@ class Advert
     public function getNbApplications()
     {
         return $this->nbApplications;
+    }
+
+    /**
+     * Set slug.
+     *
+     * @param string $slug
+     *
+     * @return Advert
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Get slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
     }
 }

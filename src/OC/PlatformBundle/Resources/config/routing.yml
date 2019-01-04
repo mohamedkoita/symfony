@@ -9,11 +9,12 @@ oc_platform_home:
         page: \d*
     
 oc_platform_view:
-    path:      /advert/{id}
+    path:      /advert/{slug}-{id}
     defaults:
         _controller: OCPlatformBundle:Advert:view
     requirements:
         id: \d+
+        slug: "[a-zA-Z0-9-]+"
 
 oc_platform_add:
     path:      /add

@@ -10,7 +10,8 @@ namespace OC\PlatformBundle\Repository;
 */
 
 use Doctrine\ORM\Entity;
-use DOctrine\ORM\QueryBuilder;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 
 class AdvertRepository extends \Doctrine\ORM\EntityRepository
@@ -61,4 +62,30 @@ class AdvertRepository extends \Doctrine\ORM\EntityRepository
         ->setParameter(':start', new \Datetime(date('Y').'-01-01')) //La date de depart qui est le 1er janvier de l'année en cours
         ->setParameter(':end', new \Datetime(date('Y').'-12-31')); //Et la date de fin qui est le 31 decembre de l'année en cours
     }
+
+    //Une méthode qui nous ramène les entités triées par date
+    public function getAdverts($page, $nbPerPage){
+        $query = $this->createQueryBuilder('a')
+        // Jointure sur l'attribut image
+        ->leftJoin('a.image', 'i')
+        ->addSelect('i')
+        // Jointure sur l'attribut categories
+        ->leftJoin('a.categories', 'c')
+        ->addSelect('c')
+        ->orderBy('a.date', 'DESC')
+        ->getQuery()
+      ;
+      $query
+      //On définit l'annonce à partir de laquelle commencer la liste
+      ->setFirstResult(($page-1)*$nbPerPage)
+      //Ainsi que le nombre d'annonces à afficher sur la page
+      ->setMaxResults($nbPerPage);
+
+      //Enfin on retourne l'objet paginator qui correspond à la requête construite
+      return new Paginator($query, true);
+
+  
+
+
+  }
 }
