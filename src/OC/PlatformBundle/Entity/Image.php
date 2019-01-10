@@ -206,6 +206,11 @@ class Image
         return 'uploads/img';
     }
 
+    public function getWebPath()
+    {
+      return $this->getUploadDir().'/'.$this->getId().'.'.$this->getUrl();
+    }
+
     protected function getUploadRootDir() {
 
         //On retourne le chemin relatif vers l'image pour notre code PHP

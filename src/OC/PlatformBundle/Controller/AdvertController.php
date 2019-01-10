@@ -147,36 +147,34 @@ class AdvertController extends Controller
 
   }
 
-  public function deleteAction($id){
-   
-      $em = $this->getDoctrine()->getManager();
-  
-      // On récupère l'annonce $id
-      $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
-  
-      if (null === $advert) {
-        throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
-      }
-  
-      // On boucle sur les catégories de l'annonce pour les supprimer
-      foreach ($advert->getCategories() as $category) {
-        $advert->removeCategory($category);
-      }
-      //var_dump($advert->getCategories());
+  public function deleteAction(Request $request, $id)
+  {
+    $em = $this->getDoctrine()->getManager();
 
-      // On boucle sur les candidatures de l'annonce pour les supprimer
-      /*foreach ($advert->getApplications() as $application) {
-        $advert->removeApplication($application);
-      }*/
-  
-      // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
-      // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
+    $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
+
+    if (null === $advert) {
+      throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+    }
+
+    // On crée un formulaire vide, qui ne contiendra que le champ CSRF
+    // Cela permet de protéger la suppression d'annonce contre cette faille
+    $form = $this->get('form.factory')->create();
+
+    if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
       $em->remove($advert);
-      // On déclenche la modification
       $em->flush();
-    
+
+      $request->getSession()->getFlashBag()->add('info', "L'annonce a bien été supprimée.");
+
       return $this->redirectToRoute('oc_platform_home');
     }
+    
+    return $this->render('OCPlatformBundle:Advert:delete.html.twig', array(
+      'advert' => $advert,
+      'form'   => $form->createView(),
+    ));
+  }
 
   public function menuAction($limit)
   {

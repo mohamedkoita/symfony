@@ -4,7 +4,7 @@
 
 <ul class="nav nav-pills nav-stacked">
   {% for advert in listAdverts %}
-    <li>
+    <li> 
       <a href="{{ path('oc_platform_view', {'id': advert.id, 'slug': advert.slug}) }}">
         {{ advert.title }}
       </a>

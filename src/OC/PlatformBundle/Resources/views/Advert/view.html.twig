@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block ocplatform_body %}
+{# On affiche tous les messages flash dont le nom est « info » #}
+  {% for message in app.session.flashbag.get('info') %}
+    <div class="alert alert-info">Message flash : {{ message }}</div>
+  {% endfor %}
 
   <h2>{{ advert.title }}</h2>
   <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i>
@@ -15,7 +19,7 @@
   <div class="well">
     {{ advert.content }}
     <img
-  src="{{ asset(advert.image.uploadDir ~ '/' ~ advert.image.id ~ '.' ~ advert.image.url) }}"
+  src="{{ asset(advert.image.webPath) }}"
   alt="{{ advert.image.alt }}"
 />
   </div>
