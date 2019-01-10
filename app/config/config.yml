@@ -73,3 +73,19 @@ stof_doctrine_extensions:
     orm:
         default:
             sluggable: true
+
+twig:
+    form_themes:
+        - 'bootstrap_3_layout.html.twig'
+
+#vich upload
+vich_uploader:
+    db_driver: orm
+    mappings:
+        images:
+            uri_prefix: '/images/'
+            upload_destination: '%kernel.root_dir%/../web/images/'
+            namer: vich_uploader.namer_origname # permet d'avoir un nom d'image unique
+            inject_on_load: true # injecte l'image au chargement du formulaire
+            delete_on_remove: true # suppression du fichier à la suppression de l’entité
+            delete_on_update: false # suppression du fichier quand un nouveau fichier est envoyé

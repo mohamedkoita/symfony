@@ -10,11 +10,14 @@
 
   <h2>{{ advert.title }}</h2>
   <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i>
-  <p>Le slug généré {{ advert.slug }}</p>
 
 
   <div class="well">
     {{ advert.content }}
+    <img
+  src="{{ asset(advert.image.uploadDir ~ '/' ~ advert.image.id ~ '.' ~ advert.image.url) }}"
+  alt="{{ advert.image.alt }}"
+/>
   </div>
 
   <ul>
@@ -52,11 +55,11 @@
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour à la liste
     </a>
-    <a href="{{ path('oc_platform_edit', {'id': advert.id}) }}" class="btn btn-default">
+    <a href="{{ path('oc_platform_edit', {'id': advert.id, 'slug':advert.slug}) }}" class="btn btn-default">
       <i class="glyphicon glyphicon-edit"></i>
       Modifier l'annonce
     </a>
-    <a href="{{ path('oc_platform_delete', {'id': advert.id}) }}" class="btn btn-danger">
+    <a href="{{ path('oc_platform_delete', {'id': advert.id, 'slug':advert.slug}) }}" class="btn btn-danger">
       <i class="glyphicon glyphicon-trash"></i>
       Supprimer l'annonce
     </a>

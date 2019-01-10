@@ -22,11 +22,12 @@ oc_platform_add:
         _controller: OCPlatformBundle:Advert:add
 
 oc_platform_edit:
-    path:      /edit/{id}
+    path:      /edit/{slug}-{id}
     defaults:
         _controller: OCPlatformBundle:Advert:edit
     requirements:
         id: \d+
+        slug: "[a-zA-Z0-9-]+"
 
 oc_platform_delete:
     path:      /delete/{id}

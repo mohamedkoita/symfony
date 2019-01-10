@@ -11,6 +11,9 @@ use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\Application;
 use OC\PlatformBundle\Entity\Skill;
 use OC\PlatformBundle\Entity\AdvertSkill;
+use OC\PlatformBundle\Entity\Image;
+use OC\PlatformBundle\Form\AdvertType;
+use OC\PlatformBundle\Form\AdvertEditType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -18,6 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+
 
 
 
@@ -88,61 +92,22 @@ class AdvertController extends Controller
 
   public function addAction(Request $request)
   {
-   //On créé un objet Advert
     $advert = new Advert();
+    $form   = $this->get('form.factory')->create(AdvertType::class, $advert);
 
-    //On créé le form builder grace au service from factory
-    $formBuilder = $this->get('form.factory')->createBuilder(FormType::Class, $advert);
+    if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($advert);
+      $em->flush();
 
-    //On ajoute les champs de l'entité que l'on veut à notre formulaire
-    $formBuilder
-    ->add('date',         DateType::Class)
-    ->add('title',        TextType::Class)
-    ->add('content',      TextareaType::Class)
-    ->add('author',       TextType::Class)
-    ->add('author_email', EmailType::Class)
-    ->add('published',    CheckboxType::Class)
-    ->add('save',         SubmitType::Class)
-    ;
-    //On génère le formulaire a partir du formBuilder
-    $form = $formBuilder->getForm();
+      $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
 
-    //On vérifie si la requête est un POST
-    if ($request->isMethod('POST')){
-      //On fait le lien requête <-> formulaire
-      //A partir de maintenant la variable $advert contient les données entrées par l'utilisateur via le formulaire
-
-      $form->handleRequest($request);
-
-      //On vérifie la validité des informations entrées dans ele formulaire
-      if ($form->isValid()) {
-        //On recupère l'entity manager
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($advert);
-        $em->flush();
-
-        $request->getSession()->getFlashBag()->add('Notice', 'Annonce bien enregistrée !');
-
-        //On redirige vers la page de l'annonce nouvellement créée
-        return $this->redirectToRoute('oc_platform_view', array('id' => $advert->getId(), 'slug' => $advert->getSlug()));
-      }
+      return $this->redirectToRoute('oc_platform_view', array('id' => $advert->getId(), 'slug'=>$advert->getSlug()));
     }
 
-    //A ce stade on mettra les actions à faire au cas où le formulaire ne serait pas valide
-    //Soit parce que la requête est de type GET
-    //Soit parce que les données passées au formulaire sont invalides
-
-
-    
-
-    //On passe la méthode createView du formulaire à la vue
-    //Pourqu'elle puisse afficher le formulaire
-
-    return $this->render('OCPlatformBundle:Advert:add.html.twig', array('form' => $form->createView(),));
-
-
-
-    
+    return $this->render('OCPlatformBundle:Advert:add.html.twig', array(
+      'form' => $form->createView(),
+    ));
   }
 
   public function editAction($id, Request $request)
@@ -156,15 +121,30 @@ class AdvertController extends Controller
       throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
     }
 
-   //Ici c'est la gestion par le formulaire
-   if ($request->isMethod('POST')) {
-    $request->getSession()->getFlashBag()->add('notice', 'Annonce bien modifiée.');
+    //On passe la variable qu'on a créé au formulaire
+    $form = $this->createForm(AdvertEditType::class, $advert);
 
-    return $this->redirectToRoute('oc_platform_view', array('id' => $advert->getId()));
-   }   
 
-    return $this->render('OCPlatformBundle:Advert:edit.html.twig', array(
-      'advert' => $advert));
+    if ($request->isMethod('POST')){
+      //On fait le lien requête <-> formulaire
+      //A partir de maintenant la variable $advert contient les données entrées par l'utilisateur via le formulaire
+
+      $form->handleRequest($request);
+
+      //On vérifie la validité des informations entrées dans ele formulaire
+      if ($form->isValid()) {
+        //On recupère l'entity manager
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($advert);
+        $em->flush();
+
+        $request->getSession()->getFlashBag()->add('notice', 'Annonce bien modifiée.');
+        //On redirige vers la page de l'annonce nouvellement modifiée
+        return $this->redirectToRoute('oc_platform_view', array('id' => $advert->getId(), 'slug' => $advert->getSlug()));
+      }
+    }
+   return $this->render('OCPlatformBundle:Advert:edit.html.twig', array('form' => $form->createView(), 'advert' => $advert));
+
   }
 
   public function deleteAction($id){
@@ -182,15 +162,21 @@ class AdvertController extends Controller
       foreach ($advert->getCategories() as $category) {
         $advert->removeCategory($category);
       }
+      //var_dump($advert->getCategories());
+
+      // On boucle sur les candidatures de l'annonce pour les supprimer
+      /*foreach ($advert->getApplications() as $application) {
+        $advert->removeApplication($application);
+      }*/
   
       // Pour persister le changement dans la relation, il faut persister l'entité propriétaire
       // Ici, Advert est le propriétaire, donc inutile de la persister car on l'a récupérée depuis Doctrine
-  
+      $em->remove($advert);
       // On déclenche la modification
       $em->flush();
     
-      return $this->render('OCPlatformBundle:Advert:delete.html.twig');
-  }
+      return $this->redirectToRoute('oc_platform_home');
+    }
 
   public function menuAction($limit)
   {
