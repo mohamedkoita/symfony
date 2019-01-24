@@ -14,10 +14,15 @@
   {% endfor %}
 
   <h2>Liste des annonces</h2>
-
+  
   <ul>
     {% for advert in listAdverts %}
-      <li> <img src="{{ asset(advert.image.webPath) }}" alt="{{ advert.image.alt }}" style="width:90px;"/>
+      <li>
+      {% if advert.image.webPath is defined %}
+       <img src="{{ asset(advert.image.webPath) }}" alt="{{ advert.image.alt }}" style="width:90px;"/>
+       {% else %}
+        <img src="/symfony/web/uploads/img/18.jpeg" alt="bonne_af.jpeg" style="width:90px;">
+      {% endif %}
         <a href="{{ path('oc_platform_view', {'id': advert.id, 'slug': advert.slug}) }}">
           {{ advert.title }}
         </a>

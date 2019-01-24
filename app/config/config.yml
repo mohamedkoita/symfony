@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
+    - { resource: "@UserBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -10,7 +11,7 @@ parameters:
 
 framework:
     #esi:             ~
-    #translator:      { fallbacks: ["%locale%"] }
+    translator:      { fallbacks: ["%locale%"] }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -89,3 +90,11 @@ vich_uploader:
             inject_on_load: true # injecte l'image au chargement du formulaire
             delete_on_remove: true # suppression du fichier à la suppression de l’entité
             delete_on_update: false # suppression du fichier quand un nouveau fichier est envoyé
+
+fos_user:
+    db_driver:     orm                       # Le type de BDD à utiliser, nous utilisons l'ORM Doctrine depuis le début
+    firewall_name: main                      # Le nom du firewall derrière lequel on utilisera ces utilisateurs
+    user_class:    OC\UserBundle\Entity\User # La classe de l'entité User que nous utilisons
+    from_email:
+        address: "mohamed@mail.com"
+        sender_name: "Admin"

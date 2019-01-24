@@ -13,7 +13,12 @@ class CoreController extends Controller
   {
     // On retourne simplement la vue de la page d'accueil
     // L'affichage des 3 dernières annonces utilisera le contrôleur déjà existant dans PlatformBundle
-    return $this->render('OCCoreBundle:Core:index.html.twig');
+
+    //On va rechercher le nom de l'utilisateur courant
+    $user = $this->getUser();
+
+    //On retourne la page index avec le nom d'utilisateur courant
+    return $this->render('OCCoreBundle:Core:index.html.twig', array('user' => $user));
 
     // La méthode longue $this->get('templating')->renderResponse('...') est parfaitement valable
   }

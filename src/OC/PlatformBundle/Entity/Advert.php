@@ -5,6 +5,14 @@ namespace OC\PlatformBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+//use OC\PlatformBundle\Validator\Antiflood;
+
+
+//use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+
 
 
 /**
@@ -64,7 +72,8 @@ class Advert
   private $slug;
 
   /**
-   * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
+   * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist", "remove"})
+   * @Assert\Valid()
   */
   private $image;
 
@@ -81,6 +90,7 @@ class Advert
    * @var \DateTime
    *
    * @ORM\Column(name="date", type="datetime")
+   * @Assert\DateTime()
    */
   private $date;
 
@@ -88,6 +98,7 @@ class Advert
    * @var string
    *
    * @ORM\Column(name="title", type="string", length=255)
+   * @Assert\Length(min=10, minMessage="Le titre de l'annonce doit dépasser 10 caractères !")
    */
   private $title;
 
@@ -95,6 +106,7 @@ class Advert
    * @var string
    *
    * @ORM\Column(name="author", type="string", length=255)
+   * @Assert\Length(min=2, minMessage="Le nom de l'auteur doit dépasser 2 caractères !")
    */
   private $author;
 
@@ -102,6 +114,8 @@ class Advert
    * @var string
    *
    * @ORM\Column(name="author_email", type="string", length=255)
+   * @Assert\NotBlank()
+   * @Assert\Email()
    */
   private $authorEmail;
 
@@ -109,6 +123,8 @@ class Advert
    * @var string
    *
    * @ORM\Column(name="content", type="string", length=255)
+   * @Assert\NotBlank()
+   * //@Antiflood()
    */
   private $content;
 
@@ -381,5 +397,24 @@ class Advert
     public function getSlug()
     {
         return $this->slug;
+    }
+
+    /**
+     * @Assert\Callback()
+     */
+    public function isContentValid(ExecutionContextInterface $context)
+    {
+      
+      $forbiddenWords = array('démotivation', 'abandon');
+
+      //On vérifie que le contenu de l'annonce ne contient pas les mots interdits
+      if (preg_match('#'.implode('|', $forbiddenWords).'#', $this->getContent()))
+      {
+        //La règle est violée on définit l'erreur
+        $context
+        ->buildViolation('Contenu invalide car il contient un mot interdit') //Message de violation
+        ->atPath('content')  //attribut de l'objet qui est violé
+        ->addViolation(); //Lève l'erreur de violation
+      }
     }
 }

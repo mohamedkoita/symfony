@@ -30,11 +30,20 @@
 
     <div class="row">
       <div id="menu" class="col-md-3">
-        <h3>Les annonces</h3>
+      {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+        <p>Bonjour <b><a href="{{ path('fos_user_profile_show') }}">{{app.user.username}}</a></b></p>
+        <p><b><a href="{{ path('logout') }}">Déconnexion</a></b></p>
+        {% else %}
+          <p><b><a href="{{ path('login') }}">Connexion</a></b></p>
+          <p><a href="{{ path('fos_user_registration_register') }}">Inscrivez vous ici !</a></p>
+       {% endif %}
+       <h3>Les annonces</h3>
         <ul class="nav nav-pills nav-stacked">
           <li><a href="{{ path('oc_core_home') }}">Accueil</a></li>
           <li><a href="{{ path('oc_platform_home') }}">Annonces</a></li>
+          {% if is_granted('ROLE_AUTEUR') %}
           <li><a href="{{ path('oc_platform_add') }}">Ajouter une annonce</a></li>
+          {% endif %} 
         </ul>
 
         <h4>Dernières annonces</h4>

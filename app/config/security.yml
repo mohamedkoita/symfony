@@ -1,24 +1,43 @@
-# To get started with security, check out the documentation:
-# http://symfony.com/doc/current/book/security.html
 security:
+  encoders:
+    Symfony\Component\Security\Core\User\User: plaintext
+    OC\UserBundle\Entity\User: sha512
 
-    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
-    providers:
-        in_memory:
-            memory: ~
+  role_hierarchy:
+    #Un admin herite des droits d'auteur et de moderateur
+    ROLE_ADMIN:       [ROLE_AUTEUR, ROLE_MODERATEUR]
+    #On garde le role superadmin car il nous resservira par la suite
+    ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
-    firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+  providers:
+    main:
+      id: fos_user.user_provider.username
+  
 
-        main:
-            anonymous: ~
-            # activate different ways to authenticate
 
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main_login:
+      pattern: ^/login$
+      anonymous: true
+    main:
+        pattern: ^/
+        anonymous: true
+        provider: main
+        form_login:
+            login_path: login
+            check_path: login_check
+        logout:
+            path: logout
+            target: login
+        remember_me:
+            secret: %secret%
 
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+  access_control:
+    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+     - { path: ^/admin, roles: ROLE_ADMIN }
+    #- { path: ^/admin, ip: 127.0.0.1, requires_channel: https }
+
+

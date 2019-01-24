@@ -21,6 +21,8 @@ class AppKernel extends Kernel
             new Vich\UploaderBundle\VichUploaderBundle(),
             // Il faut enregistrer notre nouveau bundle :
             new OC\CoreBundle\OCCoreBundle(),
+            new OC\UserBundle\UserBundle(),
+            new FOS\UserBundle\FOSUserBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

@@ -21,14 +21,17 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 
 
 
 
 class AdvertController extends Controller
-{
-
+{ 
+  
   public function indexAction($page)
   {
     if ($page < 1) {
@@ -54,11 +57,15 @@ class AdvertController extends Controller
       throw $this->createNotFoundException("La page ".$page." n'existe pas.");
     }
 
+    //On va ramener le nom de l'utilisateur courant
+    $user = $this->getUser();
+    
     // On donne toutes les informations nécessaires à la vue
     return $this->render('OCPlatformBundle:Advert:index.html.twig', array(
       'listAdverts' => $listAdverts,
       'nbPages'     => $nbPages,
       'page'        => $page,
+      'user'        => $user,
     ));
   }
 
@@ -90,6 +97,9 @@ class AdvertController extends Controller
       'listAdvertSkill' => $listAdvertSkill));
   }
 
+  /**
+   * @Security("has_role('ROLE_AUTEUR')")
+  */
   public function addAction(Request $request)
   {
     $advert = new Advert();
@@ -110,6 +120,9 @@ class AdvertController extends Controller
     ));
   }
 
+  /**
+   * @Security("has_role('ROLE_AUTEUR')")
+  */
   public function editAction($id, Request $request)
   {
     $em = $this->getDoctrine()->getManager();
@@ -147,6 +160,9 @@ class AdvertController extends Controller
 
   }
 
+  /**
+   * @Security("has_role('ROLE_AUTEUR')")
+  */
   public function deleteAction(Request $request, $id)
   {
     $em = $this->getDoctrine()->getManager();
@@ -188,5 +204,28 @@ class AdvertController extends Controller
 
     return $this->render('OCPlatformBundle:Advert:menu.html.twig', array(
       'listAdverts' => $listAdverts));
+  }
+
+  public function testAction()
+  {
+    //On créé une nouvelle annonce
+    $advert = new Advert();
+
+    $advert->setTitle('Lorem'); //On insère un titre 
+    //$advert->setContent('Lo'); //On insère le contenu dans l'annonce
+    $advert->setDate(New \DateTime()); //On met la date
+    $advert->setAuthor('Lorem Lorem Lorem'); //On insère le nom de l'auteur
+    $advert->setAuthorEmail('ju@ju.vb'); //On insère l'email
+
+    $validator = $this->get('validator');
+    $listErrors = $validator->validate($advert);
+
+    if (count($listErrors) > 0)
+    {
+      //$listErrors est un objet 
+      return new Response((string) $listErrors);
+    } else {
+      return new Response('L\'annonce est valide !');
+    }
   }
 }

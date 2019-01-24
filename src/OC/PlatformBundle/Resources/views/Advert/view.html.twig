@@ -18,10 +18,11 @@
 
   <div class="well">
     {{ advert.content }}
-    <img
-  src="{{ asset(advert.image.webPath) }}"
-  alt="{{ advert.image.alt }}"
-/>
+      {% if advert.image.webPath is defined %}
+        <img  src="{{ asset(advert.image.webPath) }}"  alt="{{ advert.image.alt }}"/>
+      {% else %}
+        <img src="/symfony/web/uploads/img/18.jpeg" alt="bonne_af.jpeg">
+      {% endif %}
   </div>
 
   <ul>
@@ -59,6 +60,8 @@
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour à la liste
     </a>
+
+    {% if is_granted('ROLE_AUTEUR') %}
     <a href="{{ path('oc_platform_edit', {'id': advert.id, 'slug':advert.slug}) }}" class="btn btn-default">
       <i class="glyphicon glyphicon-edit"></i>
       Modifier l'annonce
@@ -67,6 +70,8 @@
       <i class="glyphicon glyphicon-trash"></i>
       Supprimer l'annonce
     </a>
+    {% endif %}
+
   </p>
    
 
