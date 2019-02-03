@@ -176,6 +176,7 @@ class Advert
   public function setDate($date)
   {
     $this->date = $date;
+    return $this;
   }
 
   /**

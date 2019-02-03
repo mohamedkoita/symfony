@@ -24,6 +24,9 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 
 
 
@@ -110,6 +113,25 @@ class AdvertController extends Controller
       $em->persist($advert);
       $em->flush();
 
+      //On créé le ACL
+      $aclProvider = $this->get('security.acl.provider');
+      $objectIdentity = ObjectIdentity::fromDomainObject($advert);
+      $acl = $aclProvider->createAcl($objectIdentity);
+
+      // récupération de l'identité de l'utilisateur actuellement connecté
+      /*$tokenStorage = $this->get('security.token_storage');
+      $user = $tokenStorage->getToken()->getUser();
+      $securityIdentity = UserSecurityIdentity::fromAccount($user);*/
+      $user = $this->getUser();
+      $userSecurity = UserSecurityIdentity::fromAccount($user);
+      
+
+      // On donne l'accès au propriétaire
+      /*$acl->insertObjectAce($securityIdentity, MaskBuilder::MASK_OWNER);
+      $aclProvider->updateAcl($acl);*/
+
+      dump($user);
+
       $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
 
       return $this->redirectToRoute('oc_platform_view', array('id' => $advert->getId(), 'slug'=>$advert->getSlug()));
@@ -125,6 +147,14 @@ class AdvertController extends Controller
   */
   public function editAction($id, Request $request)
   {
+
+    $authorizationChecker = $this->get('security.authorization_checker');
+
+    // check for edit access
+    if (false === $authorizationChecker->isGranted('EDIT', $id)) {
+      throw new AccessDeniedException();
+    }
+
     $em = $this->getDoctrine()->getManager();
 
     // On récupère l'annonce $id

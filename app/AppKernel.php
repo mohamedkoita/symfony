@@ -23,6 +23,7 @@ class AppKernel extends Kernel
             new OC\CoreBundle\OCCoreBundle(),
             new OC\UserBundle\UserBundle(),
             new FOS\UserBundle\FOSUserBundle(),
+            new KevinPapst\AdminLTEBundle\AdminLTEBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

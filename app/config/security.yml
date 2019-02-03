@@ -13,6 +13,8 @@ security:
     main:
       id: fos_user.user_provider.username
   
+  acl:
+    connection: default
 
 
   firewalls:
@@ -24,7 +26,7 @@ security:
       anonymous: true
     main:
         pattern: ^/
-        anonymous: true
+        anonymous: false
         provider: main
         form_login:
             login_path: login
@@ -36,7 +38,9 @@ security:
             secret: %secret%
 
   access_control:
-    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+     - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+     - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+     #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
      - { path: ^/admin, roles: ROLE_ADMIN }
     #- { path: ^/admin, ip: 127.0.0.1, requires_channel: https }
 
